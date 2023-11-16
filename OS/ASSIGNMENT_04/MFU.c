@@ -1,160 +1,134 @@
+#include <stdio.h>
+#include <stdlib.h>
 
-
-
-
-//mfu 
-
-#include<stdio.h>
-
-struct frame
-{
+struct fnode{
     int pno;
     int freq;
+}frame[5];
 
-} frames [5];
+int str[30],fr,n,pno1;
 
-int ref_str[30];
-int np,n,i,j,frequency,currtime;
-
-int pagefound (int pno1)
+int pagefound(int pno1)
 {
-    int i;
-
-    for(i=0; i<n; i++)
-
-        if (frames[i].pno==pno1)
-            return i;
+    for (int i=0;i<fr;i++)
+        if (frame[i].pno==pno1)
+           return i;
     return -1;
-
 }
 
-int free_fr()
+int free_pg()
 {
-    for(i=0; i<n; i++)
-        if (frames[i].pno==-1)
-            return i;
+    for (int i=0;i<fr;i++)
+        if (frame[i].pno==-1)
+           return i;
     return -1;
-
 }
 
-int get_mfu()
+int getmru()
 {
     int max=0;
-
-    for(i=0; i<n; i++)
-
-        if(frames[i].freq > frames[max].freq)
-            max=i;
+    for (int i=0;i<fr;i++)
+        if (frame[i].freq > frame[max].freq)
+           max=i;
     return max;
-
 }
 
 int main()
 {
-    int i,j,pno1,p,page_fault=0, flag,cnt=0;;
-    float hr,mr;
-    printf("\n Enter how many frames: ");
+    int flag=0, cnt=0, fcnt=0;
+
+    printf("Enter the No of frames : ");
+    scanf("%d",&fr);
+    printf("Enter the No String elelments : ");
     scanf("%d",&n);
-    printf("\n Enter  length of referencestring: ");
-    scanf("%d",&np);
-    int len=np;
-    printf("\n Enter referencestring: ");
-    for(i=0; i<np; i++)
-        scanf("%d",&ref_str[i]);
-
-    for(i=0; i<n; i++)
+    for (int i=0;i<n;i++)
     {
-        frames[i].pno=-1;
-        frames[i].freq=0;
+        printf("Enter the String : ");
+        scanf("%d",&str[i]);
     }
-    printf("\n Page No.\tFrames\t\tPage Fault");
-    printf("\n---------------------------------------------------");
-    currtime=1;
-    for (p=0; p<np; p++)
-    {
-        flag=0;
-        frequency=0;
-        pno1=ref_str[p];
-        j=pagefound (pno1);
-        if(j==-1)
-        {
-            page_fault++;
-            j=free_fr();
-            if (j==-1)
-                j=get_mfu();
-            frames[j].pno=pno1;
-            frames[j].freq=1;
-            flag=1;
 
+    for (int i=0;i<fr;i++)
+    {
+        frame[i].pno = -1;
+        frame[i].freq = 0;
+    }
+
+    // int ctime;
+    printf("\nPageNo\t Frames\t   States\t Frequency\n");
+    for (int i=0;i<n;i++)
+    {
+        pno1 = str[i];
+        flag=0;
+        int j = pagefound(pno1);
+        if (j==-1)
+        {
+            fcnt++;
+            j=free_pg();
+            if (j==-1)
+               j = getmru();
+            frame[j].pno = pno1;   
+            flag=1;
+            frame[j].freq=1;
         }
         else
-            frames[j].freq++;
-        printf("\n%5d\t",pno1);
-        for (i=0; i<n; i++)
-            printf("  %d ", frames[i].pno);
+            frame[j].freq++;
 
+        printf(" %d\t",pno1);
 
-        if(flag==1)
-            printf("\t YES");
+        for (int i=0;i<fr;i++)
+            printf(" %d ",frame[i].pno);
+        if (flag==1)
+           printf("\tYes\t%d\n",frame[j].freq);
         else
         {
-            printf("\t NO");
+            printf("\tNo\t%d\n",frame[j].freq);
             cnt++;
         }
-
+        // printf(" %d\n",frame[i].freq);
     }
-    printf("\n-------------------------------------------------");
-    // hr = ((page_fault)/np);
-    // mr = ((cnt)/np);
-    printf("\nNo. of page fault: %d ",page_fault);
-    printf("\nNo. of page Hits: %d ",cnt);
-
-    // printf("\nHit Ratio : %.3f ",hr);
-    //printf("\nMis Ratio : %.3f  ",mr);
+    printf("\nTotal No of page fault : %d",fcnt);
+    printf("\nTotal No of page Hit : %d\n\n",cnt);
 }
 
-//OUTPUT:::
+/*PS F:\backup -6-1-2023\Users\dell\TYBSc_CS_23\OS> cd "f:\backup -6-1-2023\Users\dell\TYBSc_CS_23\OS\" ; if ($?) { gcc test.c -o test } ;
+if ($?) { .\test }
+Enter the No of frames : 3
+Enter the No String elelments : 16
+Enter the String : 12
+Enter the String : 15
+Enter the String : 12
+Enter the String : 18
+Enter the String : 6
+Enter the String : 8
+Enter the String : 11
+Enter the String : 12
+Enter the String : 19
+Enter the String : 12
+Enter the String : 6
+Enter the String : 8
+Enter the String : 12
+Enter the String : 15
+Enter the String : 19
+Enter the String : 8
 
-/*
-Enter how many frames: 4
+PageNo   Frames   States          Frequency
+ 12      12  -1  -1     Yes     1
+ 15      12  15  -1     Yes     1
+ 12      12  15  -1     No      2
+ 18      12  15  18     Yes     1
+ 6       6  15  18      Yes     1
+ 8       8  15  18      Yes     1
+ 11      11  15  18     Yes     1
+ 12      12  15  18     Yes     1
+ 19      19  15  18     Yes     1
+ 12      12  15  18     Yes     1
+ 6       6  15  18      Yes     1
+ 8       8  15  18      Yes     1
+ 12      12  15  18     Yes     1
+ 15      12  15  18     No      2
+ 19      12  19  18     Yes     1
+ 8       8  19  18      Yes     1
 
-Enter  length of referencestring: 15
-
- Enter referencestring:
-8
-5
-7
-8
-5
-7
-2
-3
-7
-3
-5
-9
-4
-6
-2
-
- Page No.       Frames          Page Fault
-------------------------------------------
-    8     8   -1   -1   -1       PF
-    5     8   5   -1   -1        PF
-    7     8   5   7   -1         PF
-    8     8   5   7   -1         Hit
-    5     8   5   7   -1         Hit
-    7     8   5   7   -1         Hit
-    2     8   5   7   2          PF
-    3     3   5   7   2          PF
-    7     3   5   7   2          Hit
-    3     3   5   7   2          Hit
-    5     3   5   7   2          Hit
-    9     3   9   7   2          PF
-    4     3   9   4   2          PF
-    6     6   9   4   2          PF
-    2     6   9   4   2          Hit
-----------------------------------------
-No. of page fault: 8
-No. of page Hits: 7
-[Process completed - press Enter]*/
+Total No of page fault : 14
+Total No of page Hit : 2
+*/
